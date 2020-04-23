@@ -8,8 +8,10 @@ $permitted = "https://www.domain.com/testcontact.php";
 $permitted2  = "https://domain.com/testcontact.php";
 $calling = $_SERVER['HTTP_REFERER'];
 
+//Verify referer, this prevents abuse
 if ($calling == $permitted || $calling == $permitted2) {
 
+//build out email message body
   $Body = "";
   $Body .= "Name: ";
   $Body .= $_POST['Name'];
@@ -30,14 +32,20 @@ if ($calling == $permitted || $calling == $permitted2) {
   $Body .= "\n";
   $Body .= "Website lead from online form, please contact.";
 
+//set email message headers, this sets the from address
   // $headers  = 'MIME-Version: 1.0' . "\r\n";
   //$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
   $headers .= "From: contacttest@domain.com\r\n";
+//setup email recipient
   $emailaddress = "amclint@gmail.com";
    
-  $status = mail ($emailaddress, "Website Form Lead", $Body, $headers);
+//send out email message
+$subject = "Website Form Lead";
+  $status = mail ($emailaddress, $subject, $Body, $headers);
   
+//Check result of send
   if ($status) {
+	//Set result flag and message, if populated redirect user to success page.
 	$result = 1;
 	$resultMsg = "Your request has been submitted successfully.";
 	if (strlen($successPage) > 0) {
@@ -46,7 +54,8 @@ if ($calling == $permitted || $calling == $permitted2) {
         die();
 	}
   } else {
-    $result = 0;
+    	//Set result flag and message, if populated redirect user to error page.
+	$result = 0;
 	$resultMsg = "There was a problem submitting your request, please try again.";
 	
 	if (strlen($errorPage) > 0) {
@@ -56,6 +65,7 @@ if ($calling == $permitted || $calling == $permitted2) {
 	}
   }
 } else {
+    //show URL back to user if they are trying to post against this form from an invalid referer
     print $_SERVER['HTTP_REFERER'];
 }
 
@@ -63,6 +73,9 @@ if ($calling == $permitted || $calling == $permitted2) {
 <html>
 <head>
 <title>Test</title>
+<!--
+Configured to support recaptcha, to make it work you will need to signup and configure the key at the bottom of the page
+-->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script type="text/javascript">
      function IsRecapchaValid()
@@ -103,7 +116,7 @@ if ($calling == $permitted || $calling == $permitted2) {
           <textarea name="Comments" id="Comments" cols="65" rows="7" wrap="soft" required style="background:white"></textarea>
           <br>
           <br>
-          <div class="g-recaptcha" data-sitekey="6LcZEpEUAAAAAOSAq_BefQYHo0up7r5UOMaVu9F7" align="center"></div>
+          <div class="g-recaptcha" data-sitekey="RECAPTCHA_KEY_GOES_HERE" align="center"></div>
           <br>
           <br>
           <input type="submit" value="Submit" class="submit" onclick="return IsRecapchaValid()">        
